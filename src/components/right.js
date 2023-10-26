@@ -1,37 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Checkbox, Radio, Col, Input, List, message, Pagination } from 'antd';
-import styles from './contacts.less';
+import React, { Fragment, useEffect, useState,useCallback } from "react";
+import {
+  Card,
+  Checkbox,
+  Radio,
+  Col,
+  Input,
+  List,
+  message,
+  Pagination,
+  Tooltip,
+} from "antd";
+import { StarOutlined, StarFilled } from "@ant-design/icons";
+import styles from "./contacts.less";
 
 const { Search } = Input;
 
 export default ({
-                  selectAllText, searchUserPlaceholder, deptSearch, userData,
-                  handleSearch, handleSearchUser, deptId, updateSelectUsers, debug = false,
-                  setOnSearch, nameKey, setNameKey, selectUser, setSelectUser,
-                  userNameKey, radio, showLeft, enNameKey, disableUsers,isSelectedOfMeeting
-                }) => {
-
+  selectAllText,
+  searchUserPlaceholder,
+  deptSearch,
+  userData,
+  handleSearch,
+  handleSearchUser,
+  deptId,
+  updateSelectUsers,
+  debug = false,
+  setOnSearch,
+  nameKey,
+  setNameKey,
+  selectUser,
+  setSelectUser,
+  userNameKey,
+  radio,
+  showLeft,
+  enNameKey,
+  disableUsers,
+  isSelectedOfMeeting,
+  isShowCollectUser,
+  collectUser,
+  commonUserId,
+  tip1,
+  tip2,
+  creatorUserId,
+}) => {
   const [selectAll, setSelectAll] = useState(false);
 
   // 当列表数据发生变化时，重新计算全选
   useEffect(() => {
     calculateSelectAll(selectUser);
-  }, [userData]);
+  }, [calculateSelectAll, selectUser, userData]);
 
   // 当选中人数据发生变化，重新计算全选
   useEffect(() => {
     calculateSelectAll(selectUser);
-  }, [selectUser]);
+  }, [calculateSelectAll, selectUser]);
 
   /**
    * 姓名搜索为空时处理
    * @param e
    */
-  const handleSearchChange = e => {
+  const handleSearchChange = (e) => {
     if (!e.target.value) {
       setOnSearch(false);
       setNameKey(null);
-      handleSearch('')
+      handleSearch("");
     }
   };
 
@@ -40,8 +72,8 @@ export default ({
    * @param data
    * @return {boolean}
    */
-  const isUserCheck = data => {
-    const result = selectUser.find(value => value.userId === data.userId);
+  const isUserCheck = (data) => {
+    const result = selectUser.find((value) => value.userId === data.userId);
     return !!result;
   };
 
@@ -49,7 +81,7 @@ export default ({
    * 点击用户列表的回调
    * @param e
    */
-  const onUserCheck = e => {
+  const onUserCheck = (e) => {
     const {
       target: { checked, data },
     } = e;
@@ -59,7 +91,7 @@ export default ({
       tmp.push(data);
       newSelectUser = selectUser.concat(tmp);
     } else {
-      const result = selectUser.filter(value => value.userId !== data.userId);
+      const result = selectUser.filter((value) => value.userId !== data.userId);
       newSelectUser = result.concat(tmp);
     }
     setSelectUser(newSelectUser);
@@ -75,7 +107,7 @@ export default ({
    * Radio时点击用户列表的回调
    * @param e
    */
-  const onUserRadioCheck = e => {
+  const onUserRadioCheck = (e) => {
     const {
       target: { checked, data },
     } = e;
@@ -92,20 +124,19 @@ export default ({
    * 翻页查询处理
    * @param page
    */
-  const onPageChange = page => {
+  const onPageChange = (page) => {
     if (debug) {
-      window.console.log(page)
+      window.console.log(page);
     }
     if (handleSearchUser) {
-      handleSearchUser(page, nameKey, deptId,isSelectedOfMeeting);
-      if(isSelectedOfMeeting){
+      handleSearchUser(page, nameKey, deptId, isSelectedOfMeeting);
+      if (isSelectedOfMeeting) {
         setOnSearch(false);
-      }else{
+      } else {
         setOnSearch(true);
       }
-     
     } else {
-      message.error('search function not found.');
+      message.error("search function not found.");
     }
   };
 
@@ -113,48 +144,51 @@ export default ({
    * 计算是否全部选中
    * @param newSelectUser
    */
-  const calculateSelectAll = (newSelectUser) => {
+  const calculateSelectAll = useCallback((newSelectUser) => {
     let tmp = [];
-    console.log(disableUsers,'+== console.log(disableUsers)=')
-    userData.records.forEach(value => {
-      if(!disableUsers.includes(value.userId)){
+    console.log(disableUsers, "+== console.log(disableUsers)=");
+    userData.records.forEach((value) => {
+      if (!disableUsers.includes(value.userId)) {
         tmp.push(value);
       }
-      
     });
     if (tmp.length === 0) {
       setSelectAll(false);
       return;
     }
     let count = 0;
-    tmp.forEach(val => {
-      const result = newSelectUser.find(valUser => val.userId === valUser.userId);
+    tmp.forEach((val) => {
+      const result = newSelectUser.find(
+        (valUser) => val.userId === valUser.userId
+      );
       if (result) {
         count += 1;
       }
     });
     setSelectAll(count === tmp.length);
-  };
+  },[disableUsers, userData.records]);
 
   /**
    * 点击用户全选的回调
    * @param e
    */
-  const onCheckAll = e => {
+  const onCheckAll = (e) => {
     const {
       target: { checked },
     } = e;
     setSelectAll(checked);
     const tmp = [];
-    userData.records.forEach(value => {
+    userData.records.forEach((value) => {
       tmp.push(value);
     });
     let newSelectUser = [];
-    console.log(checked,"+===checked===")
+    console.log(checked, "+===checked===");
     if (checked) {
       // 如果是选中，遍历添加，重复的不添加
-      tmp.forEach(val => {
-        const result = selectUser.find(valUser => val.userId === valUser.userId);
+      tmp.forEach((val) => {
+        const result = selectUser.find(
+          (valUser) => val.userId === valUser.userId
+        );
         if (!result && disableUsers.indexOf(val.userId) === -1) {
           newSelectUser.push(val);
         }
@@ -162,8 +196,8 @@ export default ({
       newSelectUser = selectUser.concat(newSelectUser);
     } else {
       // 不选中的遍历删除
-      selectUser.forEach(val => {
-        const result = tmp.find(valUser => val.userId === valUser.userId);
+      selectUser.forEach((val) => {
+        const result = tmp.find((valUser) => val.userId === valUser.userId);
         if (!result) {
           newSelectUser.push(val);
         }
@@ -172,11 +206,27 @@ export default ({
     updateSelectUsers(newSelectUser);
     setSelectUser(newSelectUser);
   };
-  const colWidth = showLeft?12:24;
-  console.log(userData,'===userData==')
+  const colWidth = showLeft ? 12 : 24;
+  console.log(userData, "===userData==");
   return (
-     <Col xs={colWidth} sm={colWidth} md={colWidth} lg={colWidth} xl={colWidth} className={styles.treeLeft}>
-      <Card style={{borderBottomRightRadius:'6px',borderBottomLeftRadius:0,borderTopRightRadius:'6px',borderTopLeftRadius:0,borderLeft:0}} className={styles.card}>
+    <Col
+      xs={colWidth}
+      sm={colWidth}
+      md={colWidth}
+      lg={colWidth}
+      xl={colWidth}
+      className={styles.treeLeft}
+    >
+      <Card
+        style={{
+          borderBottomRightRadius: "6px",
+          borderBottomLeftRadius: 0,
+          borderTopRightRadius: "6px",
+          borderTopLeftRadius: 0,
+          borderLeft: 0,
+        }}
+        className={styles.card}
+      >
         {deptSearch && (
           <Search
             placeholder={searchUserPlaceholder}
@@ -185,41 +235,92 @@ export default ({
           />
         )}
         {deptSearch && <br />}
-        <List className={userData.records.length === 0 ? styles.listEmpty : styles.list}
+        <List
+          className={
+            userData.records.length === 0 ? styles.listEmpty : styles.list
+          }
           size="small"
           bordered={false}
           dataSource={userData.records}
           split={false}
-          renderItem={item => {
+          renderItem={(item) => {
+            console.log(item, "item");
             return (
               <List.Item>
                 <div className={styles.itemDiv}>
                   <div className={styles.checkbox} title={item[userNameKey]}>
-                  {radio &&
-                    <Radio
-                      className={styles.checkbox}
-                      checked={isUserCheck(item)}
-                      data={item}
-                      onChange={onUserRadioCheck}
-                      disabled={disableUsers.includes(item.userId)}
-                    >
-                      {item[userNameKey]}
-                    </Radio>
-                  }
-                  {!radio &&
-                    <Checkbox
-                      className={styles.checkbox}
-                      data={item}
-                      checked={isUserCheck(item)}
-                      onChange={onUserCheck}
-                      title={item[userNameKey]}
-                      disabled={disableUsers.includes(item.userId)}
-                    >
-                      {item[userNameKey]}
-                    </Checkbox>}
+                    {radio && (
+                      <Radio
+                        className={styles.checkbox}
+                        checked={isUserCheck(item)}
+                        data={item}
+                        onChange={onUserRadioCheck}
+                        disabled={disableUsers.includes(item.userId)}
+                      >
+                        {item[userNameKey]}
+                      </Radio>
+                    )}
+                    {!radio && (
+                      <Checkbox
+                        className={styles.checkbox}
+                        data={item}
+                        checked={isUserCheck(item)}
+                        onChange={onUserCheck}
+                        title={item[userNameKey]}
+                        disabled={disableUsers.includes(item.userId)}
+                      >
+                        {item[userNameKey]}
+                      </Checkbox>
+                    )}
                   </div>
-                  <div className={disableUsers.includes(item.userId)?styles.deptName_disabled:styles.deptName} title={item.deptName}>{item.deptName}</div>
-                  {enNameKey && <div style={{ paddingLeft:'10px'}} title={item[enNameKey]} className={disableUsers.includes(item.userId)?styles.deptName_disabled:styles.deptName}>{item[enNameKey]}</div>}
+                  <div
+                    className={
+                      disableUsers.includes(item.userId)
+                        ? styles.deptName_disabled
+                        : styles.deptName
+                    }
+                    title={item.deptName}
+                  >
+                    {item.deptName}
+                  </div>
+                  {isShowCollectUser && creatorUserId !== item?.userId && (
+                    <Fragment>
+                      {commonUserId.includes(item.userId) ? (
+                        <Tooltip placement="top" title={tip2}>
+                          <StarFilled
+                            className={styles.star_fill}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              collectUser(item, "delete");
+                            }}
+                          />
+                        </Tooltip>
+                      ) : (
+                        <Tooltip placement="top" title={tip1}>
+                          <StarOutlined
+                            className={styles.star_outline}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              collectUser(item, "add");
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                    </Fragment>
+                  )}
+                  {enNameKey && (
+                    <div
+                      style={{ paddingLeft: "10px" }}
+                      title={item[enNameKey]}
+                      className={
+                        disableUsers.includes(item.userId)
+                          ? styles.deptName_disabled
+                          : styles.deptName
+                      }
+                    >
+                      {item[enNameKey]}
+                    </div>
+                  )}
                 </div>
               </List.Item>
             );
@@ -227,19 +328,25 @@ export default ({
         />
       </Card>
       <div className={styles.pagination}>
-        {!radio &&
-          <Checkbox onChange={onCheckAll} className={styles.checkbox} checked={selectAll}>
+        {!radio && (
+          <Checkbox
+            onChange={onCheckAll}
+            className={styles.checkbox}
+            checked={selectAll}
+          >
             {selectAllText}
           </Checkbox>
-        }
+        )}
+        {userData.total > 0 && (
         <Pagination
           className={styles.pageNoe}
           simple
           current={userData.current || 1}
-          pageSize={userData.size}
-          total={userData.total}
+          pageSize={userData.size || 10}
+          total={userData.total || 0}
           onChange={onPageChange}
-        />
+        />)}
       </div>
-    </Col>)
-}
+    </Col>
+  );
+};

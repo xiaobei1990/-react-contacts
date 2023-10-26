@@ -65,12 +65,11 @@
     float: left;
     text-align: left;
     width: 120px;
-    span:nth-child(2){
+    span:nth-child(2) {
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
     }
-
   }
 
   .deptName {
@@ -82,7 +81,7 @@
     white-space: nowrap;
   }
 
-  .deptName_disabled{
+  .deptName_disabled {
     float: right;
     text-align: left;
     width: 100px;
@@ -91,6 +90,19 @@
     white-space: nowrap;
     color: rgba(0, 0, 0, 0.25);
     cursor: not-allowed;
+  }
+
+  .star_fill {
+    font-size: 20px;
+    color: #30a299;
+    cursor: pointer;
+    margin-left: 27px;
+  }
+  .star_outline {
+    font-size: 20px;
+    color: #a8b1c2;
+    cursor: pointer;
+    margin-left: 27px;
   }
 }
 
@@ -161,15 +173,15 @@
   }
 }
 
-.userText{
+.userText {
   cursor: pointer;
 }
-.textColor{
-  color: #2ea498;;
+.textColor {
+  color: #2ea498;
   font-weight: 400;
   background-color: #f8f8f8;
 }
-.userTextWrapper{
+.userTextWrapper {
   display: flex;
   align-items: center;
   margin: 4px 0 4px 23px;
